@@ -20,7 +20,6 @@ columnWithIDIndex = 109
 columnWithSTRProgeny = 112
 columnWithSTRModal = 113
 
-
 def countDuplicates(list1):
     set1 = set(list1)
     return len(list1) - len(set1)
@@ -102,7 +101,7 @@ for bloodID in AffymetrixIDs:
                 print(0, end="\t")
                 controls += 1
 import sys
-print(DM1, controls, file=sys.stderr)
+print("")
 #print(len(controls), "controls", controls)
 #print(len(DM1), "DM1", DM1)
 
