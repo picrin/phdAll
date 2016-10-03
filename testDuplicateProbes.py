@@ -23,6 +23,8 @@ with open(filename, "r") as f:
     nextLineProbe = False
     for line in lines:
         columns = line.rstrip().split("\t")
+        if len(columns) == 0:
+            break
         if nextLineProbe:
             if columns[0] not in probes:
                 probes[columns[0]] = columns[1:]
@@ -33,7 +35,5 @@ with open(filename, "r") as f:
                 else:
                     with open(differentDups, "a") as f:
                         print(columns, file=f)
-        if len(columns) == 0:
-            break
         if "Affymetrix" in columns[0]:
                 nextLineProbe = True
