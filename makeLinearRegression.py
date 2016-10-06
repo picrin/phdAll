@@ -49,7 +49,7 @@ def makePlot(independentVar, dependentVar, independentVarName, dependentVarName,
     
     ax.plot(xs, ys, label='line of best fit') # shows line of best fit
     #fig.suptitle('sample correlation', fontsize=12)
-    ax.errorbar(independentVar, dependentVar, yerr=verticalBar, fmt='go', label='individuals')
+    ax.errorbar(independentVar, dependentVar, fmt='go', label='individuals')
     ax.legend(loc=(0.74, -0.72), shadow=True, fancybox=True)
     ax.axis([leftBorder, rightBorder, bottomBorder, topBorder]) # creates canvas
 

@@ -58,55 +58,86 @@ with open(STR_file, "r") as f:
 # Variables relating to the id_mapping file
 firstLineWithDataIDMap = 3
 columnWithBloodID = 13
+columnWithMuscleID = 14
 columnWithGeneLogicID = 2
+columnWithCase = 16
 
 bloodIDToGeneLogic = {}
+muscleIDToGeneLogic = {}
+geneLogicIDToCase = {}
 
 with open(id_mapping, "r") as f:
     for line in f.readlines()[firstLineWithDataIDMap:]:
         line = line.split("\t")
         geneLogicID = line[columnWithGeneLogicID]
         bloodID = line[columnWithBloodID]
+        muscleID = line[columnWithMuscleID]
         bloodIDToGeneLogic[bloodID] = geneLogicID
-
+        muscleIDToGeneLogic[muscleID] = geneLogicID
+        case = line[columnWithCase].rstrip()
+        if case == "DM1":
+            case = True
+        elif case == "Control":
+            case = False
+        geneLogicIDToCase[geneLogicID] = case
 AffymetrixIDs = None
 with open(Affymetrix_file, "r") as f:
     lines = f.readlines()
     AffymetrixIDs = [id for id in lines[0].rstrip().split("\t")[1:]]
 
-
-controls = 0
-DM1 = 0
-print("ModalAllele", end="\t")
-for bloodID in AffymetrixIDs:
-        try:
+for X in [["ModalAllele", "modalSTR"],["\nEstProgAllele", "progenySTR"]]:
+    print(X[0], end="\t")
+    for bloodID in AffymetrixIDs:
+        if bloodID in bloodIDToGeneLogic:
             geneLogicID = bloodIDToGeneLogic[bloodID]
-            print(STRIDs[geneLogicID]["modalSTR"], end="\t")
-        except KeyError:
-            if bloodID in ["189821HUEX1A11"]:
-                print(-1, end="\t")
+            try:
+                print(STRIDs[geneLogicID][X[1]], end="\t")
+            except KeyError:
+                if not geneLogicIDToCase[geneLogicID]:
+                    print(0, end="\t")
+                else:
+                    raise(ValueError("should be a control"))
             else:
-                print(0, end="\t")
-
-print("\nEstProgAllele", end="\t")
-for bloodID in AffymetrixIDs:
-        try:
-            geneLogicID = bloodIDToGeneLogic[bloodID]
-            print(STRIDs[geneLogicID]["progenySTR"], end="\t")
-            DM1 += 1
-        except KeyError:
-            if bloodID in ["189821HUEX1A11"]:
-                print(-1, end="\t")
+                if not geneLogicIDToCase[geneLogicID]:
+                    raise(ValueError("should be a case"))
+        elif bloodID in muscleIDToGeneLogic:
+            geneLogicID = muscleIDToGeneLogic[bloodID]
+            try:
+                print(STRIDs[geneLogicID][X[1]], end="\t")
+            except KeyError:
+                if not geneLogicIDToCase[geneLogicID]:
+                    print(0, end="\t")
+                else:
+                    print("missing data", end="\t")
             else:
-                print(0, end="\t")
-                controls += 1
-import sys
+                if not geneLogicIDToCase[geneLogicID]:
+                    raise(ValueError("should be a case"))
+        else:
+            raise(ValueError("insufficientData"))
 print("")
-#print(len(controls), "controls", controls)
-#print(len(DM1), "DM1", DM1)
 
-#print("Patients with STR measured", len(STRIDs))
-#print("Patients without STR data:", patientsWithoutSTR)
-#print("Duplicate STRIDs: ", countDuplicates(STRIDs))
-#print("zip(STRIDs, STRProgeny, STRModal)")
-#print(zip(STRIDs, STRProgeny, STRModal))
+print("BloodOrMuscle", end="\t")
+for bloodID in AffymetrixIDs:
+    if bloodID in bloodIDToGeneLogic:
+        print("blood", end="\t")
+    elif bloodID in muscleIDToGeneLogic:
+        print("muscle", end="\t")
+    else:
+        raise(ValueError("insufficientData"))
+print("")
+
+print("CaseOrControl", end="\t")
+for bloodID in AffymetrixIDs:
+    if bloodID in bloodIDToGeneLogic:
+        geneLogicID = bloodIDToGeneLogic[bloodID]
+    elif bloodID in muscleIDToGeneLogic:
+        geneLogicID = muscleIDToGeneLogic[bloodID]
+    else:
+        raise(ValueError("insufficientData"))
+    if geneLogicIDToCase[geneLogicID]:
+        print("case", end="\t")
+    else:
+        print("control", end="\t")
+print("")
+
+print("1 DM1 without modal data", file=sys.stderr)
