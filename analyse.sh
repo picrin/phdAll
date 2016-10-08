@@ -12,4 +12,4 @@ echo repeated probes
 wc -l duplicates.same
 echo conflicting probes
 wc -l duplicates.different
-./makeLinearRegression.py cleaned
+#./makeLinearRegression.py cleaned
