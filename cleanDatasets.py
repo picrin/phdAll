@@ -14,11 +14,6 @@ id_mapping
 A file which maps ids from STR file to ids in Affymetrix_file.
 """
 
-# Variables relating to the STR_file
-firstLineWithDataSTR = 6
-columnWithIDIndex = 109
-columnWithSTRProgeny = 112
-columnWithSTRModal = 113
 
 def countDuplicates(list1):
     set1 = set(list1)
@@ -36,22 +31,41 @@ try:
     Affymetrix_file = sys.argv[2]
     id_mapping = sys.argv[3]
 except IndexError as e:
-    print(USAGE)
-    sys.exit(1)
-
+    print(USAGE, file=sys.stderr)
 STRIDs = {}
 patientsWithoutSTR = 0
 
+# Variables relating to the STR_file
+firstLineWithDataSTR = 6
+columnWithIDIndex = 109
+columnWithSTRProgeny = 112
+columnWithSTRModal = 113
+columnWithSTRNormal1 = 110
+columnWithSTRNormal2 = 111
+
 with open(STR_file, "r") as f:
-    for line in f.readlines()[firstLineWithDataSTR:]:
+    for i, line in enumerate(f.readlines()[firstLineWithDataSTR:]):
         line = line.split("\t")
         ID = line[columnWithIDIndex]
         progeny = line[columnWithSTRProgeny]
         modal = line[columnWithSTRModal]
-        # If a patient is missing this, then they are a control, even thought they're
-        # included in this file (sic)!
         if progeny == '' or modal == '':
-            patientsWithoutSTR += 1
+            try:
+                al1 = int(line[columnWithSTRNormal1])
+            except ValueError:
+                al1 = None
+            try:
+                al2 = int(line[columnWithSTRNormal2])
+            except ValueError:
+                al2 = None
+            if al1 is None and al2 is not None:
+                STRIDs[ID] = {"progenySTR": al2, "modalSTR": al2}
+            if al2 is None and al1 is not None:
+                STRIDs[ID] = {"progenySTR": al1, "modalSTR": al1}
+            if al1 is None and al2 is None:
+                print(i, al1, al2, file=sys.stderr)
+                #raise ValueError("Insufficient Data")
+            STRIDs[ID] = {"progenySTR": max(al1, al2), "modalSTR": max(al1, al2)}
         else:
             STRIDs[ID] = {"progenySTR": progeny, "modalSTR": modal}
 
@@ -98,8 +112,9 @@ for X in [["ModalAllele", "modalSTR"],["\nEstProgAllele", "progenySTR"]]:
                 else:
                     raise(ValueError("should be a control"))
             else:
-                if not geneLogicIDToCase[geneLogicID]:
-                    raise(ValueError("should be a case"))
+                #if not geneLogicIDToCase[geneLogicID]:
+                #    raise(ValueError("should be a case"))
+                pass
         elif bloodID in muscleIDToGeneLogic:
             geneLogicID = muscleIDToGeneLogic[bloodID]
             try:
@@ -110,8 +125,9 @@ for X in [["ModalAllele", "modalSTR"],["\nEstProgAllele", "progenySTR"]]:
                 else:
                     print("missing data", end="\t")
             else:
-                if not geneLogicIDToCase[geneLogicID]:
-                    raise(ValueError("should be a case"))
+                #if not geneLogicIDToCase[geneLogicID]:
+                #    raise(ValueError("should be a case"))
+                pass
         else:
             raise(ValueError("insufficientData"))
 print("")
