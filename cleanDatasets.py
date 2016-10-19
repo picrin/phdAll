@@ -2,7 +2,7 @@
 from __future__ import print_function
 import sys
 USAGE = """USAGE is:
-./cleanDatasets.py <STR_file> <Affymetrix_file>
+./cleanDatasets.py <STR_file> <Affymetrix_file> <id_mapping>
 
 STR_file
 A file with the STR data, should be called something like "MASTERAnonymizedClinicalDataset23Feb2012.txt". Needs to contain Gene Logic ID

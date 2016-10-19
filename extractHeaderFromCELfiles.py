@@ -21,5 +21,6 @@ def processCELFile(basePath, lastPath):
     return result
 returna = {}
 for celfile in CELfiles:
-    returna[celfile] = processCELFile(sys.argv[1], celfile)
+    if ".CEL" in celfile:
+        returna[celfile] = processCELFile(sys.argv[1], celfile)
 print(json.dumps(returna))
