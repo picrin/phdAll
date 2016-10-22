@@ -1,8 +1,11 @@
 analyses
 cleaned
+cleanedSmall
 duplicates.different
 duplicates.same
 firstProbePlot.png
+modalAlleleVsResiduals.png
+residuals
 normalised*
 CELfiles
 PGFFiles

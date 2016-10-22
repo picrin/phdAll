@@ -9,5 +9,5 @@ with open(sys.argv[2]) as f:
 with open(filename, "r") as f:
     lines = f.readlines()
     swapped = [idsMapping[line] for line in lines[0].rstrip().split("\t")[1:]]
-print("\t" + "\t".join(swapped))
+print("IDs\t" + "\t".join(swapped))
 

@@ -13,4 +13,6 @@ wc -l duplicates.same
 echo conflicting probes
 wc -l duplicates.different
 echo file cleaned written to $PWD
+head -n 100 cleaned > cleanedSmall
+./computeResiduals.py cleaned > resdiduals
 echo file containes $(wc -l cleaned | awk '{print $1}') lines

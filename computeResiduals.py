@@ -1,8 +1,10 @@
 #!/bin/env python
+from __future__ import print_function 
 import scipy, scipy.stats
 import sys
 import matplotlib.pyplot as plt
 datafilename = sys.argv[1]
+
 
 def lowerUpperBoundary(varsy, slackFraction):
     varsyMax = max(varsy)
@@ -10,14 +12,16 @@ def lowerUpperBoundary(varsy, slackFraction):
     slack = (varsyMax - varsyMin) * slackFraction
     return varsyMin - slack, varsyMax + slack
 
+
 def bestFitLine(leftBorder, rightBorder, intercept, slope):
     lowY = leftBorder * slope + intercept
     highY = rightBorder * slope + intercept
     return [leftBorder, rightBorder], [lowY, highY]
 
+
 def makePlot(independentVar, dependentVar, independentVarName, dependentVarName, plotname):
     slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(independentVar, dependentVar)
-
+    
     leftBorder, rightBorder = lowerUpperBoundary(independentVar, 0.1)
 
     leftBorderLine, rightBorderLine = lowerUpperBoundary(independentVar, 0.05)
@@ -54,22 +58,43 @@ def makePlot(independentVar, dependentVar, independentVarName, dependentVarName,
     ax.axis([leftBorder, rightBorder, bottomBorder, topBorder]) # creates canvas
 
     plt.savefig(plotname)
+    return {"slope": slope, "intercept": intercept, "r_value": r_value, "p_value": p_value, "std_err": std_err}
 
 
-with open(datafilename, "r") as f:
-    lines = f.readlines()
-    nextLineProbe = False
-    for index, line in enumerate(lines):
-        columns = line.rstrip().split("\t")
-        if len(columns) == 0:
-            break
-        if "ModalAllele" in columns[0]:
-            independentVar = [int(i) for i in columns[1:]]
-        if index == 4:
-            dependentVar = [float(i) for i in columns[1:]]
-        if "Affymetrix" in columns[0]:
-            nextLineProbe = True
+def computeResiduals(independentVars, dependentVars):
+    slope, intercept, _, _, _ = scipy.stats.linregress(independentVars, dependentVars)
+    for independentVar, dependentVar in zip(independentVars, dependentVars):
+        y = slope * independentVar + intercept
+        yield(dependentVar - y)
 
-slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(independentVar, dependentVar)
-print(slope, intercept, r_value, p_value, std_err)
-makePlot(independentVar, dependentVar, "ModalAllele", "first probe", "firstProbePlot")
+import Crypto.Random.random as srandom
+def generateOrder(length):
+    return srandom.shuffle([i for i in range(length)])
+
+def generate():
+    with open(datafilename, "r") as f:
+        lines = f.readlines()
+        nextLineProbe = False
+        for index, line in enumerate(lines):
+            columns = line.rstrip().split("\t")
+            if len(columns) == 0:
+                break
+            if "IDs" in columns[0]:
+                ids = columns[1:]
+            if "ModalAllele" in columns[0]:
+                independentVar = [int(i) for i in columns[1:]]
+                movingAverage = [0] * len(independentVar)
+                count = 0
+            if  nextLineProbe:
+                dependentVar = [float(i) for i in columns[1:]]
+                next = computeResiduals(independentVar, dependentVar)
+                movingAverage = [(prior * count + observed) / (count + 1) for prior, observed in zip(movingAverage, next)]
+            if "Affymetrix" in columns[0]:
+                nextLineProbe = True
+    makePlot(independentVar, movingAverage, "Modal Allele", "Residuals", "modalAlleleVsResiduals")
+    result = {}
+    for ida, residual in zip(ids, movingAverage):
+        result[ida] = residual
+    return result
+import json
+print(json.dumps(generate()))
