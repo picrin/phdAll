@@ -89,6 +89,7 @@ def generate():
                 dependentVar = [float(i) for i in columns[1:]]
                 next = computeResiduals(independentVar, dependentVar)
                 movingAverage = [(prior * count + observed) / (count + 1) for prior, observed in zip(movingAverage, next)]
+                count += 1
             if "Affymetrix" in columns[0]:
                 nextLineProbe = True
     makePlot(independentVar, movingAverage, "Modal Allele", "Residuals", "modalAlleleVsResiduals")
