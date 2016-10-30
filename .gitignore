@@ -3,12 +3,15 @@ cleaned
 cleanedSmall
 duplicates.different
 duplicates.same
-firstProbePlot.png
-modalAlleleVsResiduals.png
+*.png
 residuals
 normalised*
 CELfiles
 PGFFiles
 krahe
 idsMapping
+generatedData
+permuted
+randomResiduals
+randomData
 .~lock*

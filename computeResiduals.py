@@ -4,6 +4,7 @@ import scipy, scipy.stats
 import sys
 import matplotlib.pyplot as plt
 datafilename = sys.argv[1]
+graphOutput = sys.argv[2]
 
 
 def lowerUpperBoundary(varsy, slackFraction):
@@ -26,7 +27,8 @@ def makePlot(independentVar, dependentVar, independentVarName, dependentVarName,
 
     leftBorderLine, rightBorderLine = lowerUpperBoundary(independentVar, 0.05)
 
-    bottomBorder, topBorder = lowerUpperBoundary(dependentVar, 0.3)
+    #bottomBorder, topBorder = lowerUpperBoundary(dependentVar, 0.3)
+    bottomBorder, topBorder = -0.05, 0.05
 
     xs, ys = bestFitLine(leftBorderLine, rightBorderLine, intercept, slope)
 
@@ -92,7 +94,7 @@ def generate():
                 count += 1
             if "Affymetrix" in columns[0]:
                 nextLineProbe = True
-    makePlot(independentVar, movingAverage, "Modal Allele", "Residuals", "modalAlleleVsResiduals")
+    makePlot(independentVar, movingAverage, "Modal Allele", graphOutput, graphOutput)
     result = {}
     for ida, residual in zip(ids, movingAverage):
         result[ida] = residual
