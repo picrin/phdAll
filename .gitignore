@@ -15,3 +15,11 @@ permuted
 randomResiduals
 randomData
 .~lock*
+*.aux
+*.bbl
+*.blg
+*.log
+*.pdf
+*.bcf
+*.out
+*run.xml

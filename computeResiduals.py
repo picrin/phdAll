@@ -59,7 +59,7 @@ def makePlot(independentVar, dependentVar, independentVarName, dependentVarName,
     ax.legend(loc=(0.74, -0.72), shadow=True, fancybox=True)
     ax.axis([leftBorder, rightBorder, bottomBorder, topBorder]) # creates canvas
 
-    plt.savefig(plotname)
+    plt.savefig(plotname, bbox_inches='tight')
     return {"slope": slope, "intercept": intercept, "r_value": r_value, "p_value": p_value, "std_err": std_err}
 
 

@@ -16,3 +16,7 @@ echo file cleaned written to $PWD
 head -n 100 cleaned > cleanedSmall
 ./computeResiduals.py cleaned bloodAvgResidual > residuals
 echo file containes $(wc -l cleaned | awk '{print $1}') lines
+mv bloodAvgResidual.png report/
+./analysePermuted.sh
+./makeBoxplots.sh
+./makeReports.sh > /dev/null
