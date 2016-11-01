@@ -1,0 +1,112 @@
+\title{Experiment Proposal}
+\author{
+        Adam Kurkiewicz \\
+       	College of Medical, Veterinary and Life Sciences\\
+        University of Glasgow\\
+	\href{mailto:a.kurkiewicz.1@research.gla.ac.uk}{a.kurkiewicz.1@research.gla.ac.uk}
+}
+
+\date{\today}
+
+\documentclass[12pt]{article}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage[
+    backend=biber,
+    style=authoryear-icomp,
+    natbib=true,
+    url=false, 
+    doi=true,
+    eprint=false
+]{biblatex}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+%\usepackage{float}
+
+\addbibresource{main.bib}
+\addbibresource[datatype=ris]{irizarry.ris}
+
+\begin{document}
+\maketitle
+
+\section{Biological model}
+
+Figure \ref{genes} is a graphical representation of my understanding of the biological problem we're studying. This is based on our meetings + reading I've done so far. Could you please correct this if it's wrong/ incomplete?
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=130mm]{genes.png}
+\caption{Average Blood Residual \label{genes}}
+\end{figure}
+
+A box at the top represents DMPK, which is a kinase. It can regulate activity of other proteins. If these other proteins are transcription factors, DMPK will have effect on expression levels of various genes, which is what we can detect in our measurements.
+
+A case with severe MD1 will have a long DMPK transcript and therefore have "worse" DMPK. Worse could mean either lower concentrations in cytosol/membranes or lower efficacy.
+
+On average this means that:
+\begin{itemize}
+  \item Cases will have lower expression of green genes than healthy controls. This is because cases have insufficient upregulation of promoter A.
+  \item Cases will have higher expression of blue genes than controls. This is because cases have insufficient upregulation of promoter B.
+  \item Cases will have higher expression of salmon genes than controls. This is because cases have insufficient downregulation of blocker C.
+  \item Cases will have the same expression of gray genes as controls This is because DMPK activity has no influence on transcription factors D-F.
+\end{itemize}
+
+This model may not fully capture our setting. For example we would expect DMPK (red) to be differentially transcribed due to high nuclear concentrations of DMPK transcript in MD1 patients. This would be the case even if DMPK does not regulate transcription factor D (i.e. DMPK does not regulate its own transcription).
+
+Further, an assumption that each gene is regulated by only one transcription factor may be too simplistic. But assuming that there are many transcription factors, most of which aren't phosphorylated by DMPK, then this assumption may actually be realistic in our case. Indeed, for any given gene we would see at most one (and most likely zero) of potentially many transcription factors regulating that gene.
+
+\section{Research Question(s)}
+
+I'm not sure if we have a fully agreed research question yet. It seems there are multiple points of interest.
+
+\textbf{Are Individual Specific Effects real?} Alternatively are they:
+\begin{itemize}
+  \item An artifact of our method (Unlikely, as I checked with random \& independently distributed data).
+  \item An artifact of gene coexpression (Working on it). \label{genCoe}
+  \item An artifact of highly expressed genes having bigger influence.
+  \item Characteristic to our experiment only (Unlikely, ISEs also observed in randomly permuted modal allele length). A thing to do would be to take any publicly accessible CEL files and repeat our analysis to check if we still see ISEs.
+\end{itemize}
+
+\textbf{Are Average Residuals useful?}
+\begin{itemize}
+  \item \textbf{Are Average Residuals simply a convoluted measure of gene coexpression \ref{genCoe}?} If so are they a good measure of gene coexpression? Can we do anything useful with a measure of gene coexpression?
+  \item \textbf{Can we predict differentially expressed genes better than existing approaches (e.g. limma), using Average Residuals or otherwise?} An obvious problem with this approach is that we don't have prior knowledge of differentially expressed genes, which means we don't have an objective way of comparing models. Simon mentioned using cross-validation on rows (probesets; transcript clusters). I didn't understand this idea. The point I'm struggling with is that even if we exclude some genes, we don't know if we excluded significant or non-significant genes, so we can't measure how well the method has done.
+  \item \textbf{Is using Average Residuals sound?} Using average residuals to have another go at data analysis is suspicious. This could be alleviated by computing Average Residuals only for 9/10 folds and cross-validating. Cross-validation suffers from the problem discussed in the previous question.
+\end{itemize}
+
+If we take a step back and look just at the data or just at the residuals, can we notice any interesting patterns? Following Simon's suggestion, doing heat maps may be useful.
+
+As discussed yesterday, my point of interest would be to try predicting modal allele length from expression data.
+
+\section{Can modal allele length be effectively predicted from the microarray data?}
+
+An obvious strength of this research question is that any model predicting modal allele length from the microarray data can be effectively checked using cross-validation or variance of the linear regression.
+
+A weakness, as pointed out by Darren, is that we aren't really interested in the answer to this research question. We already know the modal allele length, why would we want to predict it?
+
+I agree that predicting modal allele is not biologically interesting \textit{per se}. But \textit{the way} this prediction works might already be interesting.
+
+Imagine for example that our model will end up depending on 200 genes to accurately predict modal allele length. Further, imagine that these 200 hundred genes will admit a partition $A$, consisiting of sets $A_{1}$, $A_{2}$ and $A_{3}$ with the property that any model accurately predicting modal allele length will have to take at least one gene from $A_{1}$, one gene from $A_{2}$ and one gene from $A_{3}$. This already would be interesting, and would have a straightforward biological explanation: $A_1$ could be taken to be the green genes, $A_{2}$ could be taken to be the blue genes, and $A_{3}$ could be taken to be the salmon genes.
+
+How could a statistical model predicting the modal allele from expression levels look like? The following is a simple proposal using leave-2 out cross-validation.
+
+Step 1:
+
+\begin{itemize}
+  \item Take 32/35 individuals to be our predictors. Take 2 individuals to be our validators.
+  \item Use limma to identify genes which are significantly correlated with modal allele length for 32/35 individuals. Take a relatively high False Discovery Rate, for example 0.5. This will result in a list where approximately half of the genes are blue, green or salmon, and half of the genes are gray. Let's say that this produces a set of genes $X$.
+  \item Measure how well $X$ has done at predicting the validators modal allele length using linear regression with vectors of size $|X|$ as the input.
+  \item Repeat (you can do this up to about 500 times before running into duplicates).
+\end{itemize}
+
+If this procedure ends up predicting modal allele length well (and we will be able to tell exactly how well), then we can go to step 2:
+
+\begin{itemize}
+  \item Look at the lists of genes which happened to belong to $X$ in each of 500 runs of step 1. Take genes which appear in at least 50\% of runs of step 1. Take them to be the "stable" predicting set $X_{all}$.
+  \item Cluster genes in $X_{all}$ into coexpressed groups, hoping for an effect similar to Figure \ref{genes}, i.e. being able to split genes into green, blue and salmon groups.
+\end{itemize}
+
+Would this be a sensible approach?
+
+\end{document}
