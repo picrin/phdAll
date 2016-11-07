@@ -12,8 +12,7 @@ krahe
 idsMapping
 generatedData
 permuted
-randomResiduals
-randomData
+random*
 .~lock*
 *.aux
 *.bbl

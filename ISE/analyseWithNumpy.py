@@ -21,7 +21,6 @@ with open(cleaned) as f:
             ids = line[1:]
         if rowID == "ModalAllele":
             modalAllele = [int(i) for i in line[1:]]
-            
 
 with open(cleaned) as f:
     dataArray =  np.loadtxt(f, delimiter="\t", skiprows=skipCount, usecols=columns)
@@ -40,12 +39,12 @@ for i in range(rowNo):
         residualsArray[i][j] = residual
     #break
 averageResiduals = {}
-rejected = 0
+p_values = []
 for i in range(columnNo):
-    averageResiduals[ids[i]] = sum(residualsArray[:,i])/len(residualsArray[:,i])
-    if scipy.stats.ttest_1samp(residualsArray[:,i], 0)[1] < 0.05:
-        rejected += 1
-print(rejected)
+    #averageResiduals[ids[i]] = sum(residualsArray[:,i])/len(residualsArray[:,i])
+    p_value = scipy.stats.ttest_1samp(residualsArray[:,i], 0)[1]
+    p_values.append(p_value)
+
 import json
 
 # Test results the same with other residuals.
@@ -58,7 +57,23 @@ import json
 
 # Boxplot
 data_to_plot = [[dataArray[:, i]] for i in range(columnNo)]
-fig = plt.figure(1, figsize=(9, 6))
+fig = plt.figure(figsize=(9, 6))
 ax = fig.add_subplot(111)
 bp = ax.boxplot(data_to_plot, showfliers=False)
 fig.savefig(sys.argv[1] + 'Boxplot.png', bbox_inches='tight')
+
+# p-values
+# data_to_plot = []
+#print(zip(ids,p_values))
+
+import math
+fig = plt.figure(figsize=(9,6))
+ax = fig.add_subplot(111)
+x = range(len(ids))
+#loggedPValues = [math.log(i, 10) for i in p_values]
+#loggedPValues = p_values
+#ax.semilogx(x, p_values)
+ax.semilogy(range(len(p_values)), p_values)
+fig.savefig(sys.argv[1] + "PValues.png", bbox_inches='tight')
+
+
