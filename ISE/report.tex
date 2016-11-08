@@ -1,0 +1,79 @@
+\title{Fortnightly report}
+\author{
+        Adam Kurkiewicz \\
+       	College of Medical, Veterinary and Life Sciences\\
+        University of Glasgow\\
+	\href{mailto:a.kurkiewicz.1@research.gla.ac.uk}{a.kurkiewicz.1@research.gla.ac.uk}
+}
+
+\newcommand{\putImage}[2]{
+  \begin{figure}[!htb]
+  \centering
+  \includegraphics[width=140mm]{#1.png}
+  \caption{#2}
+  \end{figure}
+}
+
+\date{\today}
+
+\documentclass[12pt]{article}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+
+\begin{document}
+\maketitle
+
+\section{Individual Specific Effects}
+I've carried out 5 experiments in order to understand under what conditions ISEs do occur.
+
+Among these 5 experiments 3 are already known to you:
+\begin{itemize}
+\item Real Data -- this is computing p-values of null hypothesis "residuals are centered around 0" on a real, unmodified dataset. Shows strong ISEs.
+\item Permuted Modal Allele -- as above, but the modal allele is randomly permuted. Unexpectedly, shows strong ISEs.
+\item Normally Distributed Random Data -- a synthetically generated dataset with "empirically estimated parameters". Doesn't show ISEs
+\end{itemize}
+
+I've now added 3 interesting experiments:
+\begin{itemize}
+\item Each Row Permuted -- this is the experiment both John and Simon wanted to see.
+\item Global Transcription Factors -- this is a new experiment, in which I generate a single 200-element array, which I call "transcription factor array". The array contains small, normally distributed, random values of up- and down- regulation. To each gene I then assign a random transcription factor (out of 200 possible). Then I modify all values in the gene for each indvidual by the value of this transcription factor. Doesn't show ISEs.
+\item Individual Transcription Factor -- as above, but the transcription factor array isn't shared -- each individual gets their own onw. Shows Strong ISEs
+\end{itemize}
+
+I have run each experiment multiple times, but I'm reporting only on a single run, as it is only a preliminary research, and all the runs look pretty similar anyway.
+
+\section{P-values}
+
+Apologies for the quality of the plots. I do realise that it would be more correct to use a boxplot for this type of the plot, but unfortunately matplotlib's boxplots are broken in the y-axis log mode. And as you'll see the y-axis log mode really is badly needed. Hopefully a little explanation as to how to read this plots will help.
+\begin{itemize}
+  \item Please ignore any perceived correlations and trends, etc. All experiments (with exception of Real Data) have at least the independent variable randomly permuted (I hope that Real Data also has been appropriately randomised).
+  \item p-values normally are between 0 and 1. Because we're interested in both very small (hundreds of orders of magnitude) and big p-values I'm using a y-axis log plot. The logs will be then between -infinity and 0.
+  \item Although the plots are y-axis logged the values displayed on the y-axis are not logged (which is I believe standard practice with log plots, I'm not sure I haven't done much log plots before).
+\end{itemize}
+
+As you'll notice very small p-values occur in 3 experiments, Real Data, Permuted Modal Allele and Individual Transcription Factors.
+
+
+\putImage{cleanedPermutedPValues}{Permuted Each Row}
+
+\putImage{randomDataPValues}{Normally Distributed Random Data}
+
+\putImage{randomTranscriptionFactorsPValues}{Global Transcription Factors}
+
+\putImage{randomIndividualTranscriptionFactorsPValues}{Individual Transcription Factors}
+
+\putImage{cleanedPValues}{Real Data}
+
+\putImage{permutedPValues}{Permuted Modal Allele}
+
+\section{boxplots}
+
+Unfortunately, permuting each row has a big effect on residuals boxplots. This is interesting but I haven't had much time to drill into it.
+
+\putImage{cleanedPermutedBoxplot}{permuted residuals boxplot}
+\putImage{cleanedBoxplot}{real residuals boxplot}
+
+\end{document}

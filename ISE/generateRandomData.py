@@ -9,7 +9,7 @@ norm = scipy.stats.norm
 
 genes = 20000
 
-individuals = 30
+individuals = 35
 
 genLoc = 10
 genSca = 3

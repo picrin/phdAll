@@ -58,7 +58,7 @@ import json
 
 
 # Boxplot
-data_to_plot = [[dataArray[:, i]] for i in range(columnNo)]
+data_to_plot = [[residualsArray[:, i]] for i in range(columnNo)]
 fig = plt.figure(figsize=(9, 6))
 ax = fig.add_subplot(111)
 bp = ax.boxplot(data_to_plot, showfliers=False)
@@ -75,7 +75,7 @@ x = range(len(ids))
 #loggedPValues = [math.log(i, 10) for i in p_values]
 #loggedPValues = p_values
 #ax.semilogx(x, p_values)
-ax.semilogy(range(len(p_values)), p_values)
+ax.semilogy(range(len(p_values)), p_values, marker="o")
 fig.savefig(sys.argv[1] + "PermutedPValues.png", bbox_inches='tight')
 
 
