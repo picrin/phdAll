@@ -22,3 +22,6 @@ random*
 *.bcf
 *.out
 *run.xml
+.ipynb_checkpoints/
+__pycache__/
+
