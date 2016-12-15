@@ -6,5 +6,7 @@ pdflatex normalise.tex
 jupyter nbconvert analyseLimma.ipynb --to latex
 pdflatex analyseLimma.tex
 cd overleaf
-pdflatex main.tex
+xelatex main
+biber main
+xelatex main
 mv main.pdf ../litReview.pdf
