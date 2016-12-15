@@ -4,6 +4,7 @@ CELfiles/
 .ipynb_checkpoints/
 __pycache__/
 *_files/
-cleaned
+cleaned*
 overleaf
+ormalised*
 normalised*
