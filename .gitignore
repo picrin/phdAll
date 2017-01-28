@@ -8,3 +8,9 @@ cleaned*
 overleaf
 ormalised*
 normalised*
+*.aux
+*.out
+*.log
+*.pdf
+*.tex
+DSE*
