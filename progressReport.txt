@@ -1,0 +1,28 @@
+#Progress Report 29.01.2017
+
+## ISEs
+
+#I've followed up on the work I did a few weeks ago, and I renormalised our data using "mean-adjusted RMA". This normalisation procedure works as follows:
+
+- Do the RMA.
+- Compute individual's average expression level $MEAN_GEL_{i}$ and average expression level of all individuals $MEAN_MEAN_GEL$.
+- For each individual modify each gene by removing a correction factor $MEAN_MEAN_GEL - MEAN_GEL_{i}$
+
+This gives data, where each individual has equal value of mean gene expression.
+
+Under this normalisation ISEs dissapear, i.e. are no longer significant, nor have a big numeric value (only about $10^{-14}), many orders of magnitude less than the measurement error.
+
+However, DSEs still exist, although the more genes we take, the closer to 0 the DSE will be.
+
+## Other improvements of "mean adjusted RMA"
+
+I have re-run all experiments/analyses up to date (fixing any issues, which arised) and I've noticed two interesting things:
+
+- Our new normalisation method seems to help very much (by a factor of 2) with gene significance. Although previous methods gave p-values of 20% earlier on, now we get 10%.
+- Our new normalisation method seems to remove many genes from the "mildly significant" region of p-values < 0.5, 284 genes vs 803.
+
+## More expriments
+
+I've written a small framework for running expriments. The framework caches all experiments on hard drive, with meaningful filenames, so that I can switch off my computer without loosing 2+ hours of CPU time, and import the results into other programs.
+
+I test for biological significance of DSEs by taking 2n of the most significant genes and then splitting them into lower n for computing DSEs and higher n for computing the p-values. The results are again negative.
